@@ -15,7 +15,6 @@ def main():
             print_data(data)
 
 
-
 def print_data(data):
     """Regular for loot to print iterable data"""
     for info in data:
@@ -25,7 +24,7 @@ def print_data(data):
 def execute_user_input(user_input: str):
     """
     Executing user input. if input right - return data
-    if input wrong or cause a error - return None
+    if input wrong or cause an error - return None
     """
     user_input = user_input.split()
     try:
