@@ -1,11 +1,12 @@
 from load_data import load_data
+from fuzzywuzzy import fuzz, process
 ALL_DATA = load_data()
 
 
 def main():
+    for data in ALL_DATA["data"]:
+        print(data["SHIPNAME"])
     """A command line interface"""
-    # print("\n".join(get_all_countries_no_duplicates()))
-    # check = get_menu_dispatch_keys()
     print_starting_message()
     while True:
         user_input = input()
@@ -13,6 +14,29 @@ def main():
 
         if data:
             print_data(data)
+
+
+def search_ship_fuzzy_partial(search_ship_word: str):
+    """
+    Searching for partial fuzzy wuzzy highest match of ship names
+    with search_ship_word and return list of info
+    for matched ship in search
+    :return: list['key: value', ....] info on matched ship in search
+    """
+
+    #  list where each element (ship_name, index) index same as in list_of_data
+    list_of_ship_names = [ALL_DATA["data"][index]["SHIPNAME"].lower()
+                                for index in range(len(ALL_DATA["data"]))]
+
+    # Find the best match using the process.extractOne() function with fuzz.partial_ratio as the scorer
+    best_match = process.extractOne(search_ship_word, list_of_ship_names, scorer=fuzz.token_sort_ratio)
+
+    # best_match is a tuple (matched_key, score)
+    matched_ship_name, __ = best_match
+    index = list_of_ship_names.index(matched_ship_name)
+
+    info_list = [f"{key}: {value}" for key, value in ALL_DATA["data"][index].items()]
+    return info_list
 
 
 def print_data(data):
@@ -30,7 +54,7 @@ def execute_user_input(user_input: str):
     try:
         command = user_input[0]
         if len(user_input) > 1:
-            argument = int(user_input[1])
+            argument = (user_input[1])
             return MENU_DISPATCH[command](argument)
 
         return MENU_DISPATCH[user_input[0]]()
@@ -59,6 +83,7 @@ def get_top_countries(num_countries):
     returns list of top num_countries by its ships
     'country: number_ships'
     """
+    num_countries = int(num_countries)
     ship_per_country = {}
     # counting countries by it ships
     for data in ALL_DATA["data"]:
@@ -103,9 +128,15 @@ def get_ships_by_types():
     return list_of_ship_types
 
 
+def create_speed_histogram():
+    pass
+
+
 def get_menu_commands():
     """return all the menu options"""
-    menu_list = ["Available commands:", "help", "show_countries", "top_countries <num_countries>", "ships_by_types"]
+    menu_list = ["Available commands:", "help", "show_countries",
+                 "top_countries <num_countries>", "ships_by_types",
+                 "search_ship <search_name>", "speed_histogram"]
     return menu_list
 
 
@@ -113,7 +144,9 @@ MENU_DISPATCH = {
     "help": get_menu_commands,
     "show_countries": get_all_countries_no_duplicates,
     "top_countries": get_top_countries,
-    "ships_by_types": get_ships_by_types
+    "ships_by_types": get_ships_by_types,
+    "search_ship": search_ship_fuzzy_partial,
+    "speed_histogram": create_speed_histogram
 }
 if __name__ == '__main__':
     main()
