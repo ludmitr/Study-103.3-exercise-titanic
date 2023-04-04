@@ -78,16 +78,42 @@ def get_top_countries(num_countries):
     return sorted_dict[:num_countries]
 
 
-def get_menu_dispatch_keys():
+def get_ships_by_types():
+    """
+    Returns list of how many ships of each type
+    ['ship_type: number',...]
+    """
+    # counting ship types
+    count_ship_types_dict = {}
+    for data in ALL_DATA["data"]:
+        ship_type = data["TYPE_SUMMARY"]
+        if ship_type not in count_ship_types_dict:
+            count_ship_types_dict[ship_type] = 0
+        count_ship_types_dict[ship_type] += 1
+
+    # making list of ship types from high to low
+    list_of_ship_types = [
+        f"{key}: {value}"
+        for key, value in sorted(
+            count_ship_types_dict.items(),
+            key=lambda item: item[1],
+            reverse=True
+        )
+    ]
+    return list_of_ship_types
+
+
+def get_menu_commands():
     """return all the menu options"""
-    menu_list = ["Available commands:", "help", "show_countries", "top_countries <num_countries>"]
+    menu_list = ["Available commands:", "help", "show_countries", "top_countries <num_countries>", "ships_by_types"]
     return menu_list
 
 
 MENU_DISPATCH = {
-    "help": get_menu_dispatch_keys,
+    "help": get_menu_commands,
     "show_countries": get_all_countries_no_duplicates,
-    "top_countries": get_top_countries
+    "top_countries": get_top_countries,
+    "ships_by_types": get_ships_by_types
 }
 if __name__ == '__main__':
     main()
