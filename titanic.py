@@ -23,13 +23,13 @@ def search_ship_fuzzy_partial(search_ship_word: str):
     for matched ship in search
     :return: list['key: value', ....] info on matched ship in search
     """
+    # creating list of shipnames from ALL_DATA
+    list_of_ship_names = []
+    for data in ALL_DATA["data"]:
+        list_of_ship_names.append(data["SHIPNAME"].lower())
 
-    #  list where each element (ship_name, index) index same as in list_of_data
-    list_of_ship_names = [ALL_DATA["data"][index]["SHIPNAME"].lower()
-                                for index in range(len(ALL_DATA["data"]))]
-
-    # Find the best match using the process.extractOne() function with fuzz.partial_ratio as the scorer
-    best_match = process.extractOne(search_ship_word, list_of_ship_names, scorer=fuzz.token_sort_ratio)
+    # Find the best match of search_ship_word in list_of_ship_names
+    best_match = process.extractOne(search_ship_word, list_of_ship_names, scorer=fuzz.token_set_ratio)
 
     # best_match is a tuple (matched_key, score)
     matched_ship_name, __ = best_match
