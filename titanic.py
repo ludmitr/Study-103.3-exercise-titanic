@@ -113,7 +113,7 @@ def get_ships_by_types():
     Returns list of how many ships of each type
     ['ship_type: number',...]
     """
-    # counting ship types
+    # create dict, key=ship_type, value=frequency of this type in data
     count_ship_types_dict = {}
     for data in ALL_DATA["data"]:
         ship_type = data["TYPE_SUMMARY"]
