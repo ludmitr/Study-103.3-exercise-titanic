@@ -1,11 +1,16 @@
 from load_data import load_data
 from fuzzywuzzy import fuzz, process
+import matplotlib.pyplot as plt
+import numpy as np
+
+
 ALL_DATA = load_data()
 
 
 def main():
+    create_speed_histogram()
     for data in ALL_DATA["data"]:
-        print(data["SHIPNAME"])
+        print(data["SPEED"])
     """A command line interface"""
     print_starting_message()
     while True:
@@ -129,7 +134,34 @@ def get_ships_by_types():
 
 
 def create_speed_histogram():
-    pass
+    """
+    Creates a histogram of ship speeds from a list of ship data.
+    The histogram has bins with a width of 5 units each.
+
+    The function reads the ship speeds from the ALL_DATA global variable,
+    creates a histogram with matplotlib, saves it as a PNG file
+    in the project folder, and then displays the histogram.
+    """
+    # creating list with ship speed floats
+    ship_speeds = [float(data["SPEED"]) for data in ALL_DATA["data"]]
+
+    # Define the bins for the histogram
+    max_speed = max(ship_speeds)
+    bins = np.arange(0, max_speed + 1, 5)
+
+    # Create a histogram of the ship speeds
+    plt.hist(ship_speeds, bins=bins, edgecolor='black', alpha=0.7)
+
+    # Set the labels and title
+    plt.xlabel('Speed')
+    plt.ylabel('Frequency')
+    plt.title('Histogram of Ship Speeds')
+
+    # Save the histogram as a PNG file in the project folder
+    plt.savefig('ship_speeds_histogram.png')
+
+    # Show the histogram
+    plt.show()
 
 
 def get_menu_commands():
