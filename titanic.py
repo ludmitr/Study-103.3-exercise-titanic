@@ -2,22 +2,23 @@ from load_data import load_data
 from fuzzywuzzy import fuzz, process
 import matplotlib.pyplot as plt
 import numpy as np
-
+import folium
 
 ALL_DATA = load_data()
+BREAK_LOOP_SENTINEL = "break_loop"
 
 
 def main():
-    create_speed_histogram()
-    for data in ALL_DATA["data"]:
-        print(data["SPEED"])
     """A command line interface"""
     print_starting_message()
     while True:
         user_input = input()
         data = execute_user_input(user_input)
 
-        if data:
+        if data == "break_loop":
+            print("BYE BYE")
+            break
+        elif data:
             print_data(data)
 
 
@@ -63,9 +64,12 @@ def execute_user_input(user_input: str):
             return MENU_DISPATCH[command](argument)
 
         return MENU_DISPATCH[user_input[0]]()
-    except Exception:
-        return None
-
+    except KeyError:
+        return ["Invalid command. Please try again."]
+    except ValueError:
+        return ["Invalid input. Please try again."]
+    except Exception as e:
+        return [e]
 
 def print_starting_message():
     """Printing starting message of a program"""
@@ -159,16 +163,37 @@ def create_speed_histogram():
 
     # Save the histogram as a PNG file in the project folder
     plt.savefig('ship_speeds_histogram.png')
+    return ["Histogram saved"]
 
-    # Show the histogram
-    plt.show()
+
+def exit_cmi():
+    return BREAK_LOOP_SENTINEL
+
+
+def save_map_with_ship_location():
+    """Create a map using Folium library and save it as an HTML file in the project folder.
+    The map will show the locations of all the ships present in ALL_DATA."""
+    ship_locations = [[float(data["LON"]), float(data["LAT"])] for data in ALL_DATA["data"]]
+    # Create a map centered at the average location of all ships
+    avg_latitude = sum(location[0] for location in ship_locations) / len(ship_locations)
+    avg_longitude = sum(location[1] for location in ship_locations) / len(ship_locations)
+    ship_map = folium.Map(location=[avg_latitude, avg_longitude], zoom_start=5)
+
+    # Add a marker for each ship's location
+    for location in ship_locations:
+        folium.Marker(location, popup="Ship location").add_to(ship_map)
+
+    # Save the map as an HTML file in the project folder
+    ship_map.save("ship_locations_map.html")
+
+    return ["saved map with ship locations!!"]
 
 
 def get_menu_commands():
     """return all the menu options"""
     menu_list = ["Available commands:", "help", "show_countries",
                  "top_countries <num_countries>", "ships_by_types",
-                 "search_ship <search_name>", "speed_histogram"]
+                 "search_ship <search_name>", "speed_histogram", "draw_map", "exit_cmi"]
     return menu_list
 
 
@@ -178,7 +203,9 @@ MENU_DISPATCH = {
     "top_countries": get_top_countries,
     "ships_by_types": get_ships_by_types,
     "search_ship": search_ship_fuzzy_partial,
-    "speed_histogram": create_speed_histogram
+    "speed_histogram": create_speed_histogram,
+    "draw_map": save_map_with_ship_location,
+    "exit": exit_cmi,
 }
 if __name__ == '__main__':
     main()
