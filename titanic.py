@@ -1,8 +1,9 @@
-from load_data import load_data
 from fuzzywuzzy import fuzz, process
 import matplotlib.pyplot as plt
 import numpy as np
 import folium
+from load_data import load_data
+
 
 ALL_DATA = load_data()
 BREAK_LOOP_SENTINEL = "break_loop"
@@ -22,7 +23,7 @@ def main():
         if data == "break_loop":
             print("BYE BYE")
             break
-        elif data:
+        if data:
             print_data(data)
 
 
@@ -39,7 +40,9 @@ def search_ship_fuzzy_partial(search_ship_word: str):
         list_of_ship_names.append(data["SHIPNAME"].lower())
 
     # Find the best match of search_ship_word in list_of_ship_names
-    best_match = process.extractOne(search_ship_word, list_of_ship_names, scorer=fuzz.token_set_ratio)
+    best_match = process.extractOne(
+                search_ship_word, list_of_ship_names,
+                scorer=fuzz.token_set_ratio)
 
     # best_match is a tuple (matched_key, score)
     matched_ship_name, __ = best_match
@@ -72,8 +75,9 @@ def execute_user_input(user_input: str):
         return ["Invalid command. Please try again."]
     except ValueError:
         return ["Invalid input. Please try again."]
-    except Exception as e:
-        return [e]
+    except Exception:
+        return None
+
 
 def print_starting_message():
     """Printing starting message of a program"""
@@ -171,6 +175,7 @@ def create_speed_histogram():
 
 
 def exit_cmi():
+    """Return text value that will exit loop in main function"""
     return BREAK_LOOP_SENTINEL
 
 
@@ -196,7 +201,7 @@ def save_map_with_ship_location():
 def get_menu_commands():
     """return all the menu options"""
     menu_list = ["Available commands:"]
-    for command in MENU_DISPATCH.keys():
+    for command in MENU_DISPATCH:
         if command in REQUIRED_ARGUMENTS:
             menu_list.append(f"{command} {REQUIRED_ARGUMENTS[command]}")
         else:
