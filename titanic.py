@@ -6,6 +6,10 @@ import folium
 
 ALL_DATA = load_data()
 BREAK_LOOP_SENTINEL = "break_loop"
+REQUIRED_ARGUMENTS = {
+    "top_countries": "<num_countries>",
+    "search_ship": "<search_name>",
+}
 
 
 def main():
@@ -191,9 +195,12 @@ def save_map_with_ship_location():
 
 def get_menu_commands():
     """return all the menu options"""
-    menu_list = ["Available commands:", "help", "show_countries",
-                 "top_countries <num_countries>", "ships_by_types",
-                 "search_ship <search_name>", "speed_histogram", "draw_map", "exit_cmi"]
+    menu_list = ["Available commands:"]
+    for command in MENU_DISPATCH.keys():
+        if command in REQUIRED_ARGUMENTS:
+            menu_list.append(f"{command} {REQUIRED_ARGUMENTS[command]}")
+        else:
+            menu_list.append(command)
     return menu_list
 
 
