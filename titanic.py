@@ -182,10 +182,10 @@ def exit_cmi():
 def save_map_with_ship_location():
     """Create a map using Folium library and save it as an HTML file in the project folder.
     The map will show the locations of all the ships present in ALL_DATA."""
-    ship_locations = [[float(data["LON"]), float(data["LAT"])] for data in ALL_DATA["data"]]
+    ship_locations = [[float(data["LAT"]), float(data["LON"])] for data in ALL_DATA["data"]]
     # Create a map centered at the average location of all ships
-    avg_latitude = sum(location[0] for location in ship_locations) / len(ship_locations)
-    avg_longitude = sum(location[1] for location in ship_locations) / len(ship_locations)
+    avg_latitude = (sum(location[0] for location in ship_locations)) / len(ship_locations)
+    avg_longitude = (sum(location[1] for location in ship_locations)) / len(ship_locations)
     ship_map = folium.Map(location=[avg_latitude, avg_longitude], zoom_start=5)
 
     # Add a marker for each ship's location
